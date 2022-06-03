@@ -90,30 +90,30 @@ for (j in 1:nScenarios){
       #STEP 5: Model     
       
       #Households
-      yd[j,i] = wbd[j,i] + rm[j,i-1]*mh[j,i-1]
-      mh[j,i] = mh[j,i-1] + yd[j,i] - c[j,i]
-      c[j,i] = alpha0[j,i] + alpha1[j,i]*yd[j,i] + alpha2*mh[j,i-1]
+      yd[j,i] = wbd[j,i] + rm[j,i-1]*mh[j,i-1]                      #Disposable income
+      mh[j,i] = mh[j,i-1] + yd[j,i] - c[j,i]                        #Demand for bank deposits
+      c[j,i] = alpha0[j,i] + alpha1[j,i]*yd[j,i] + alpha2*mh[j,i-1] #Consumption
       
       #Firms
-      y[j,i] = c[j,i] + id[j,i]
-      kt[j,i] = kappa*y[j,i-1]
-      da[j,i] = delta*k[j,i-1]
-      af[j,i] = da[j,i]
-      id[j,i] = gamma*(kt[j,i] - k[j,i-1]) + da[j,i]
-      k[j,i] = k[j,i-1] + id[j,i] - da[j,i]
-      ld[j,i] = ld[j,i-1] + id[j,i] - af[j,i]
-      wbd[j,i] = y[j,i] - rl[j,i-1]*ld[j,i-1] - af[j,i]    
+      y[j,i] = c[j,i] + id[j,i]                                     #Total output (income)
+      kt[j,i] = kappa*y[j,i-1]                                      #Target capital stock
+      da[j,i] = delta*k[j,i-1]                                      #Depreciation allowances
+      af[j,i] = da[j,i]                                             #Amortization funds
+      id[j,i] = gamma*(kt[j,i] - k[j,i-1]) + da[j,i]                #Investment
+      k[j,i] = k[j,i-1] + id[j,i] - da[j,i]                         #Current stock of capital
+      ld[j,i] = ld[j,i-1] + id[j,i] - af[j,i]                       #Demand for bank loans
+      wbd[j,i] = y[j,i] - rl[j,i-1]*ld[j,i-1] - af[j,i]             #Wage bill
       
       #Banks
-      ls[j,i] = ls[j,i-1] + (ld[j,i] - ld[j,i-1])   #Supply of bank loans
-      ms[j,i] = ms[j,i-1] + (ls[j,i] - ls[j,i-1])
-      rm[j,i] = rl[j,i]
-      rl[j,i] = rl_bar[j,i]
+      ls[j,i] = ls[j,i-1] + (ld[j,i] - ld[j,i-1])                   #Supply of bank loans
+      ms[j,i] = ms[j,i-1] + (ls[j,i] - ls[j,i-1])                   #Supply of bank deposits
+      rm[j,i] = rl[j,i]                                             #Interest rate on deposits
+      rl[j,i] = rl_bar[j,i]                                         #Interest rate on loans
       
       # Wage Bill equations
-      wbs[j,i] = w[j,i]*n[j,i]      #Supply of wages  
-      n[j,i] = y[j,i]/pr[j,i]       #Labour demand
-      w[j,i] = wbd[j,i]/n[j,i]      #Wage rate
+      wbs[j,i] = w[j,i]*n[j,i]                                      #Supply of wages  
+      n[j,i] = y[j,i]/pr[j,i]                                       #Labour demand
+      w[j,i] = wbd[j,i]/n[j,i]                                      #Wage rate 
     }
   }
 }
