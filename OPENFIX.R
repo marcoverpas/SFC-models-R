@@ -582,7 +582,9 @@ layout(matrix(c(1,2,3,4,5,6), 3, 2, byrow = TRUE))
 
 #Hidden equation
 plot(b_cb_ukuk_s[,1:nPeriods]-(b_uk_s[,1:nPeriods] - b_ukuk_s[,1:nPeriods] - b_usuk_s[,1:nPeriods]),type="l",col="red4",lty=1,lwd=3,cex.main=1,font.main=1,main="a) Consistency check",ylab='Value',xlab='Periods',ylim=range(-1,1))
-legend("bottomleft",c("B_cb_ukuk_s - (B_uk_s - B_ukuk_s - B_usuk_s)"),  bty = 'n', cex=0.8, lty=c(1), lwd=c(3), col = c("red4"), box.lty=0)
+legend("bottomleft", 
+       legend = expression(Equation (12.82):~italic(B["cb£s"]^"£" - (B[s]^"£" - B["£s"]^"£" - B["$s"]^"£"))),
+       bty = 'n', cex = 1, lty = c(1), lwd = c(3), col = c("red4"), box.lty = 0)
 
 #Plot GDPs
 plot(y_k_uk[,1:nPeriods],type="l",col=1,lty=1,lwd=3,cex.main=1,font.main=1,main="b) UK and US real GDP after \n increase in US propensity to import",ylab='Value',xlab='Periods',ylim=range(min(y_k_us[,1:nPeriods]),max(y_k_uk[,1:nPeriods])) )
