@@ -2,4 +2,4 @@
 
 SFC and other toy models created using `R`.
 
-See also my six lectures on SFC [models](https://github.com/marcoverpas/Six_lectures_on_sfc_models)
+See also my [six_lectures_on_SFC_models](https://github.com/marcoverpas/Six_lectures_on_sfc_models)
