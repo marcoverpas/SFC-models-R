@@ -1,9 +1,10 @@
 #BMW model for R
-#from Wynne Godley and Marc Lavoie
-#Monetary Economics
-#Chapter 7 
 
-#Created by Marco Veronese Passarella on 30 May 2019
+#This code replicates results in the book Monetary Economics:
+#An Integrated Approach to Credit, Money, Income, Production and Wealth,
+#by Wynne Godley and Marc Lavoie, chapter 7, figures 7.1 to 7.4.
+
+#Created by Marco Veronese Passarella, 30 May 2019
 
 #STEP 1: Clear the workspace and define the number of periods and scenarios
 rm(list=ls(all=TRUE))
