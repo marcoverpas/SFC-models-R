@@ -1,0 +1,146 @@
+#Dafermos and Nikolaidi model for students (September 2018)
+
+#This code was developed by Yanis Dafermos and Maria Nikolaidi.
+#It allows creating a SFC model calibrated using data for the US economy
+
+#Reproduced by Marco Veronese Passarella, April 4th, 2020
+
+#Clear all
+rm(list=ls(all=TRUE))
+T<-51
+
+#Upload data from Dropbox
+Data <- read.csv( "https://www.dropbox.com/s/kusoabl4s8clhvj/data_dafnik.csv?dl=1" ) 
+
+#Endogenous variables
+W<- vector(length=T)
+Yc<- vector(length=T)
+CO<- vector(length=T)
+M<- vector(length=T)
+Y<- vector(length=T)
+TP<- vector(length=T)
+RP<- vector(length=T)
+DP<- vector(length=T)
+I<- vector(length=T)
+K<- vector(length=T)
+L<- vector(length=T)
+BP<- vector(length=T)
+M_red<- vector(length=T)
+Y_star<- vector(length=T) #auxiliary variable
+u<- vector(length=T) #auxiliary variable
+gy<- vector(length=T) #auxiliary variable
+lev<- vector(length=T) #auxiliary variable
+
+#Parameters
+
+for (i in 1:T) {
+  if (i == 1)
+  { for (iterations in 1:10){
+    
+    sw<-mean(Data[,c("sw")]) #Sets the wage share equal to its mean value in the US during the period 1960-2010 [Category B(i)]
+    rm<- mean(Data[,c("rm")]) #Sets the deposit interest rate equal to its mean value in the US during the period 1960-2010 [Category B(i)]
+    rl<- mean(Data[,c("rl")]) #Sets the loan interest rate equal to its value in the US during the period 1960-2010 [Category B(i)]
+    c1<-0.9 #Selected from a reasonable range of values [Category B(iii)]
+    c2<-0.75 #Selected from a reasonable range of values [Category B(iii)]
+    u[i]<-Data[1,c("u")] #US capacity utilisation in 1960
+    v<-Y[i]/(K[i]*u[i]) #Calibrated such that capacity utilisation in the model matches the capacity utilisation in the US in 1960 [Category C(i)]; we use equations (14) and (15)
+    gk<- mean(Data[,c("gy")]) #Calibrated such that the model generates the baseline scenario [Category C(ii)]
+    c3<-(K[i]/L[i])*((Y[i]/K[i])*(1+gk)-gk-(c1*W[i]/K[i]+c2*Yc[i]/K[i])) #Calibrated such that the model generates the baseline scenario; ensures that Y/K will remain contant during the simulation period [Category C(ii)]; see Appendix B
+    sf<-(gk-gk*(L[i]/K[i]))/(TP[i]/(K[i]/(1+gk))) #Calibrated such that the model generates the baseline scenario; ensures that L/K will remain contant during the simulation period [Category C(ii)]; see Appendix B
+    
+    #Initial values
+    Y[i]<-Data[1,c("Y")] #US GDP in 1960 (in trillion 2009 US$)
+    K[i]<-Data[1,c("K")] #US capital stock in 1960 (in trillion 2009 US$)
+    L[i]<-Data[1,c("L")] #Loans of US non-financial corporations in 1960 (in trillion 2009 US$)
+    W[i]<-sw*Y[i] #Derived from equation (1)
+    Yc[i]<-DP[i]+BP[i]+rm*(M[i]/(1+gk)) #Derived from equation (2)
+    CO[i]<-Y[i]-I[i] #Derived from equation (5)
+    TP[i]<-Y[i]-W[i]-rl*(L[i]/(1+gk)) #Derived from equation (6)
+    RP[i]<-sf*TP[i] #Derived from equation (7)
+    DP[i]<-TP[i]-RP[i] #Derived from equation (8)
+    I[i]<-(gk/(1+gk))*K[i] #Derived from equation (9)
+    BP[i]<-rl*(L[i]/(1+gk))-rm*(M[i]/(1+gk)) #Derived from equation (12)
+    M[i]<-L[i] #Derived from equation (13)
+    Y_star[i]<-v*K[i] #Derived from equation (14) 
+    lev[i]<-L[i]/K[i] #Derived from equation (17) 
+    gy[i]<-gk #Based on the baseline scenario
+    
+  }
+  }
+  
+  #Equations
+  else {
+    for (iterations in 1:10){
+      
+      #Households
+      W[i]<-sw*Y[i]
+      Yc[i]<-DP[i]+BP[i]+rm*M[i-1]
+      CO[i]<-c1*W[i-1]+c2*Yc[i-1]+c3*M[i-1]
+      M[i]<-M[i-1]+W[i]+Yc[i]-CO[i]
+      
+      #Firms
+      Y[i]<-CO[i]+I[i]
+      TP[i]<-Y[i]-W[i]-rl*L[i-1]
+      RP[i]<-sf*TP[i]
+      DP[i]<-TP[i]-RP[i]
+      I[i]<-gk*K[i-1]
+      K[i]<-K[i-1]+I[i]
+      L[i]<-L[i-1]+I[i]-RP[i]
+      
+      #Banks
+      BP[i]<-rl*L[i-1]-rm*M[i-1]
+      M_red[i]<-L[i]
+      
+      #Auxiliary equations
+      Y_star[i]<-v*K[i]
+      u[i]<-Y[i]/Y_star[i]
+      gy[i]<-(Y[i]-Y[i-1])/Y[i-1]
+      lev[i]<-L[i]/K[i]
+      
+    }
+  }
+}
+
+
+#Table
+matrixname<-paste("Table")
+assign (matrixname, (round(cbind(M_red, M, u, gy, lev, Y), digits=4)))
+
+#Graphs
+plot(Data[1:T,c("lev")], type="l", xlab= "Year", ylab= "Leverage ratio", xaxt="n")
+lines(Table[1:T,c("lev")], type="l", lty=3)
+axis(side=1, at=c(1,11,21,31,41, 51), labels=c("1960","1970","1980", "1990","2000","2010"))
+legend("bottomright", legend=c("Actual", "Simulated"), lty=c(1,3), bty="n")
+
+plot(Data[1:T,c("u")], type="l", xlab= "Year", ylab= "Capacity utilisation", xaxt="n")
+lines(Table[1:T,c("u")], type="l", lty=3)
+axis(side=1, at=c(1,11,21,31,41, 51), labels=c("1960","1970","1980", "1990","2000","2010"))
+legend("bottomright", legend=c("Actual", "Simulated"), lty=c(1,3), bty="n")
+
+plot(Data[1:T,c("gy")], type="l", lty=1, xlab= "Year", ylab= "Growth rate of output", xaxt="n")
+lines(Table[1:T,c("gy")], type="l", lty=3)
+axis(side=1, at=c(1,11,21,31,41, 51), labels=c("1960","1970","1980", "1990","2000","2010"))
+legend("bottomright", legend=c("Actual", "Simulated"), lty=c(1,3), bty="n")
+
+plot(Data[1:T,c("Y")], type="l", lty=1, xlab= "Year", ylab= "Output", xaxt="n")
+lines(Table[1:T,c("Y")], type="l", lty=3 )
+axis(side=1, at=c(1,11,21,31,41, 51), labels=c("1960","1970","1980", "1990","2000","2010"))
+legend("bottomright", legend=c("Actual", "Simulated"), lty=c(1,3), bty="n")
+
+###########################################
+
+#Model validation
+
+#Install.packages("mFilter") #This command is necessary if mFilter has not been installed in your computer
+library(mFilter)
+
+Y_log<-log((Table[,c("Y")]))
+Yactual_log<-log((Data[,c("Y")]))
+Y.hp <- hpfilter((Y_log), freq=100, drift=TRUE)
+actualY.hp <- hpfilter((Yactual_log), freq=6.25, drift=TRUE)
+acfYactual=acf(actualY.hp$cycle, lag.max=20, plot=F)
+acfY=acf(Y.hp$cycle,lag.max=20, plot=F)
+
+plot(acfYactual$acf, ylab=" ", xlab="Lag", type="l", lty=1, ylim=c(-0.5,1))
+lines(acfY$acf, type="l", lty=3, ylim=c(-0.5,1))
+legend("topright", legend=c("Actual", "Simulated"), lty=c(1,3), bty="n")
