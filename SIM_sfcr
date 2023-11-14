@@ -1,1 +1,114 @@
-This code replicates model SIM by using the SFCR package. It is an amended version of the original code developed by Joao Macalos.
+#################################################
+#
+# SIM model simulated using "SFCR" package
+#
+# Last change: 13 May 2021 
+#
+# Note: this code replicates and estimates the SIM model developed in "Monetary
+# Economics: An Integrated Approach to Credit, Money, Income, Production and Wealth",
+# by Wynne Godley and Marc Lavoie, chapter 3.
+#
+# The code is an amended version of the original code developed by Joao Macalos.
+#
+# For information on "SFCR" package, see:
+# https://joaomacalos.github.io/sfcr/index.html
+#
+#################################################
+
+
+#Clear all
+rm(list=ls(all=TRUE))
+
+#Set directory (optional)
+#setwd("C:/Users/...")
+
+#Upload (or download) the packages
+library(sfcr)
+library(ggplot2)
+library(ggraph)
+library(networkD3)
+
+#Create the system of equations
+eqs <- sfcr_set(
+  TXs ~ TXd,
+  YD ~ W * Ns - TXs,
+  Cd ~ alpha1 * YD + alpha2 * Hh[-1],
+  Hh ~ YD - Cd + Hh[-1],
+  Ns ~ Nd,
+  Nd ~ Y / W,
+  Cs ~ Cd,
+  Gs ~ Gd,
+  Y ~ Cs + Gs,
+  TXd ~ theta * W * Ns,
+  Hs ~ Gd - TXd + Hs[-1]
+)
+
+#Assign value to parameters and exogenous variables
+external <- sfcr_set(
+  Gd ~ 20, 
+  W ~ 1,
+  alpha1 ~ 0.6,
+  alpha2 ~ 0.4,
+  theta ~ 0.2
+)
+
+#Solve and simulate the baseline scenario
+sim <- sfcr_baseline(
+  equations = eqs, 
+  external = external,
+  periods = 60, 
+  
+)
+
+#Print all the results
+sim
+
+#Plot results (disposable income and consumption)
+plot(sim$YD[],type="l",col="1",lwd=2,lty=1,ylim=range(min(sim$YD[]),max(sim$YD)))
+lines(sim$Cd,type="l",col="2",lwd=2,lty=2)
+
+#Create transactions-flow matrix (TFM)
+tfm_sim <- sfcr_matrix(
+  columns = c("Households", "Firms", "Government"),
+  codes = c("h", "f", "g"),
+  c("Consumption", h = "-Cd", f = "+Cs"),
+  c("Govt. Exp.", f = "+Gs", g = "-Gd"),
+  c("Factor Income", h = "W * Ns", f = "-W * Ns"),
+  c("Taxes", h = "-TXs", g = "+TXd"),
+  c("Ch. Money", h = "-d(Hh)", g = "d(Hs)")
+)
+
+#Check consistency of the TFM
+sfcr_validate(tfm_sim, sim, which = "tfm")
+
+#Create Sankey's diagram of TFM
+sfcr_sankey(tfm_sim, sim)
+
+#Plot the DAG structure of the model
+sfcr_dag_cycles_plot(eqs)
+
+#Plot the block structure of the model
+sfcr_dag_blocks_plot(eqs)
+
+#Introduce a shock (increase government spending: Gd from 20 to 30 in period 5)
+shock <- sfcr_shock(
+  variables = sfcr_set(
+    Gd ~ 30
+  ),
+  start = 5,
+  end = 60
+)
+
+#Simulate the new scenario
+sim2 <- sfcr_scenario(
+  baseline = sim,
+  scenario = shock,
+  periods = 60
+)
+
+#Print the new results
+sim2
+
+#Plot new results (disposable income and consumption)
+plot(sim2$YD[],type="l",col="1",lwd=2,lty=1,ylim=range(min(sim2$YD[]),max(sim2$YD[])))
+lines(sim2$Cd[],type="l",col="2",lwd=2,lty=2)
