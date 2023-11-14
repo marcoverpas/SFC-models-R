@@ -3,7 +3,7 @@
 #This code was developed by Alessandro Caiani. It allows creating
 #a simple Agent-Based SFC model, building upon model SIM.
 
-#https://sites.google.com/view/alessandro-caiani/java-macro-ab-simulation-toolkit
+#Caiani's website: https://sites.google.com/view/alessandro-caiani/java-macro-ab-simulation-toolkit
 
 #TIME SPAN OF THE SIMULATION
 Time = 200
