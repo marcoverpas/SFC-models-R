@@ -1,5 +1,9 @@
 #SIM Model, R version
 
+#This code replicates results in the book Monetary Economics:
+#An Integrated Approach to Credit, Money, Income, Production and Wealth,
+#by Wynne Godley and Marc Lavoie, chapter 3, figures 3.2 and 3.3.
+
 #Created by Mrco Veronese Passarella on 2 October 2018
 
 #Clear
