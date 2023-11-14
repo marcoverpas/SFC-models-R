@@ -1,0 +1,254 @@
+#BASIC VERSION OF THE SIMEX_AB MODEL
+
+#This code was developed by Alessandro Caiani. It allows creating
+#a simple Agent-Based SFC model, building upon model SIM.
+
+#TIME SPAN OF THE SIMULATION
+Time = 200
+#MONTE CARLO REPETITIONS
+MC = 1
+
+
+#NUMBER OF HOUSHOLDS
+N = 1000
+#NUMBER OF FIRMS
+NF = 10
+
+#LABOR PRODUCTIVITY
+phi = 1
+#PROPENSITY TO CONSUME OOI
+cy = 0.8
+#PROPENSITY TO CONSUME OOW
+ch = 0.2
+#TAX RATE
+tau = 0.2 
+#GOVERNMENT REAL EXPENDITURE
+gExogenous = 150
+#WAGES
+wageExogenous=10
+#PRICES
+priceExogenous=10
+
+
+#DATAFRAME WHERE STORING MC SYNTHETIC RESULTS
+
+#THE MONTE CARLO LOOP
+for (mc in 1:MC) {
+  #SET THE SEED
+  set.seed(mc)
+  
+  #DEFINE THE DATAFRAME OF RESULTS
+  res_mc = as.data.frame(matrix(0,ncol=22,nrow=Time,dimnames = list(NULL,c("GReal","GNominal","CDesiredReal","CDesired","CFeasible","salesToG","salesToH","WB","Y","Employed","UR","Output","YHd","Inventories","CashH","CashF","Profits","netProfitsF", "TaxIncome","TaxProfits","PDef","PDebt"))))
+  
+  # SIMULATION INITIAL CONDITIONS
+  #FIRMS' PRICES
+  p = matrix(data = 0, ncol = NF)
+  #WORKERS' WAGES
+  w = matrix(data = 0, ncol = N)
+  #FIRMS' TOTAL REAL DEMAND
+  demandF= matrix(data = 0, ncol = NF)
+  #FIRMS' REAL DEMAND FROM HUSEHOLDS
+  demandFH= matrix(data = 0, ncol = NF)
+  #FIRMS' REAL DEMAND FROM THE GOVERNEMENT
+  demandFG= matrix(data = 0, ncol = NF)
+  #HOUSEHOLDS INITIAL DISPOSABLE INCOME
+  yHd = matrix(data = 0, ncol = N)
+  #HOUSHOLDS' CASH
+  cashH = matrix(data = 0, ncol = N)
+  #FIRMS' CASH
+  cashF= matrix(data = 0, ncol = NF)
+  #HOUSEHOLDS EMPLOYMENT CONDITION: 1=UNEMPLOYED 0=EMPLOYED
+  unemp = matrix(data = 1, ncol = N)
+  #FIRMS' EMPLOYEES NUMBER
+  employees = matrix(data = 0, ncol = NF)
+  #HOUSHOLDS' EMPLOYER INDEXES
+  employer = matrix (data = 0, ncol = N)
+  #FIRMS' WAGE BILL
+  wb = matrix(data = 0, ncol = NF)
+  #HOUSHOLDS' GROSS INCOME
+  yH = matrix(data = 0, ncol = N)
+
+  
+  #THE SIMULATION LOOP
+  for (t in 1:Time) {
+  
+    #TICK 0 THE GOVERNMENT SETS ITS REAL EXPENDITURE
+    g=gExogenous
+    res_mc$GReal[t] = gExogenous
+    
+    #TICK 1 FIRMS SET THE PRICE (CONSTANT)
+    p[]=priceExogenous
+    
+    
+    #TICK 2 WORKERS SET THEIR RESERVATION WAGE (CONSTANT)
+    w[]=wageExogenous
+    
+    #TICK 3 THE GOVERNMENT PLACE ITS ORDERS TO FIRMS
+    # ASSUMPTION: G IS DISTRIBUTED UNIFORMLY ACROSS FIRMS
+    demandFG[] = g / NF
+    res_mc$GNominal[t] = sum(demandFG * p)
+    
+    #TICK 4 HOUSEHOLDS SELECT THEIR GOODS SUPPLIER RANDOMLY
+    indexF = ceiling(NF * runif(N))
+    
+    #TICK 5.A HOUSEHOLDS SET THEIR DEMAND IN REAL TERMS...
+    yHdExpected = yHd
+    cDesiredReal = cy * yHdExpected / p[indexF] + ch * cashH / p[indexF]
+    cDesiredReal = floor(cDesiredReal)
+    res_mc$CDesiredReal[t]=sum(cDesiredReal)
+    #BUT THEN CHECK IF CONSUMPTION FINANCIALLY FEASIBLE
+    cDesired=cDesiredReal * p[indexF]
+    res_mc$CDesired[t]=sum(cDesired)
+    cFeasible = pmin(cDesired, cashH)
+    cFeasibleReal=pmin(cDesiredReal, floor(cashH/p[indexF]))
+    res_mc$CFeasible[t]=sum(cFeasible)
+    
+    
+    #TICK 5.B SET THEIR ORDERS AND PAY...
+    cashH = cashH - cFeasible
+    #GOVERNMENT PAYS
+    govBalance=-res_mc$GNominal[t]
+    #WHILE FIRMS DETERMINE TOTAL DEMAND AND REVENUES
+    demandFH []= 0
+    for (j in 1:NF) {
+      #DEMAND FROM HOUSHOLDS WHO SELECTED FIRM J
+      demandFH[j] = sum(cFeasibleReal[indexF == j])
+      #TOTAL DEMAND= DEMAND FROM GOVERNMENT + DEMAND FROM HOUSEHOLDS
+      demandF[j] = demandFG[j] + sum(cFeasibleReal[indexF == j])
+      #RECEIVE PAYMENTS FROM GOVERNMENT AND HOUSEHOLDS
+      cashF[j] = cashF[j] + sum(cFeasible[indexF == j]) + demandFG[j]*p[j]
+    }
+    res_mc$salesToG[t] = sum(demandFG * p)
+    res_mc$salesToH[t] = sum(demandFH * p)
+    
+    #TICK 6 FIRMS DETERMINE LABOR REQUIRED TO PRODUCE DEMANDED QUANTITIES
+    #ASSUMPTION: INTEGER QUANTITIES OF LABOR
+    laborRequired = floor(demandF / phi)
+    
+    #TICK 7 FIRMS INTERACT WITH WORKERS (CHOSEN RANDOMLY) ON THE LABOR MARKET
+    #DETERMINE FIRMS' LABOR DEMAND
+    laborDemand=laborRequired-employees
+    
+    #IF ALREADY MORE EMPLOYEES THAN NEEDED FIRE THOSE IN EXCESS (CHOSEN RANDOMLY)
+    for (i in 1:NF){
+      if (laborDemand[i]<0){
+        employeesShuffled=sample(length(which(employer==i))) 
+        toBeFired=which(employer==i)[employeesShuffled[1:-laborDemand[i]]]
+        employees[i]=employees [i]+laborDemand [i]
+        unemp[toBeFired]=1
+        employer[toBeFired]=NA
+        laborDemand[i]=0
+      }
+    }
+  
+    householdsShuffled=sample(N)
+    wb[] = 0
+    yH[] = 0
+    for (j in 1:N) {
+      # GET THE J-TH RANDOMLY ORDERED HOUSEHOLD
+      indexW = householdsShuffled[j]
+      #IF UNEMPLOYED THEN INTERACT WITH FIRMS WHICH ARE HIRING
+      if (unemp[indexW] == 1) {
+        activeFirms = which(laborDemand > 0)
+        #IF THERE ARE FIRMS LOOKING FOR WORKERS THEN RANDOMLY SELECT ONE OF THEM
+        if (length(activeFirms) > 0) {
+          indexEmployerTemp = ceiling(length(activeFirms) * runif(1))
+          indexEmployer = activeFirms[indexEmployerTemp]
+          #WORKER IS HIRED
+          employees[indexEmployer] = employees[indexEmployer] + 1
+          laborDemand[indexEmployer]=laborDemand[indexEmployer]-1
+          unemp[indexW] = 0
+          employer[indexW] = indexEmployer
+          #WAGES ARE PAID 
+          cashH[indexW] = cashH[indexW] + w[indexW]
+          wb[indexEmployer] = wb[indexEmployer] + w[indexW]
+          cashF[indexEmployer] = cashF[indexEmployer] - w[indexW]
+          yH[indexW] = w[indexW]
+        }
+        #ELSE IF NO FIRM LOOKING FOR WORKERS THEN REMAIN UNEMPLOYED
+        else{
+          employer[indexW] = NA
+          yH[indexW] = 0
+        }
+      }
+      #ELSE IF ALREADY EMPLOYED GET WAGE
+      else{
+        yH[indexW] = w[indexW]
+        cashH[indexW] = cashH[indexW] + w[indexW]
+        wb[employer[indexW]] = wb[employer[indexW]] + w[indexW]
+        cashF[employer[indexW]] = cashF[employer[indexW]] - w[indexW]
+      }
+    }
+    res_mc$WB[t] = sum(wb)
+    res_mc$Y[t] = sum(yH)
+    res_mc$Employed[t] = sum(employees)
+    res_mc$UR[t] = (N - res_mc$Employed[t]) / N
+    
+    #TICK 8 PRODUCTION TAKES PLACE 
+    output = phi * employees
+    res_mc$Output[t] = sum(output)
+    #OUTPUT TEMPORARY STORED AS INVENTORIES
+    inventories = output
+    
+    #THEN OUTPUT DELIVERED TO DEMANDERS
+    for (j in 1:NF) {
+      inventories[j] = inventories[j] - demandF[j]
+      if (inventories[j]<0) {
+        break
+        }
+      }
+    
+    res_mc$Inventories[t] = sum(inventories)
+    
+    #TICK 9 PROFITS ARE COMPUTED...
+    profitsF = demandF*p - wb
+    res_mc$ProfitsF[t] = sum(profitsF)
+    #AND TAXES ON INCOME ARE PAID
+    yHd = (1 - tau) * yH
+    res_mc$TaxIncome[t] = sum(tau * yH)
+    res_mc$YHd[t] = sum(yHd)
+    cashH = cashH - tau * yH
+    #AND TAXES ON PROFITS ARE PAID
+    netProfitsF = profitsF- pmax(tau * profitsF, 0)
+    res_mc$TaxProfits[t] = sum (pmax(tau * profitsF, 0))
+    res_mc$netProfitsF = sum(netProfitsF)
+    cashF = cashF - pmax(tau * profitsF, 0)
+    govBalance=govBalance+res_mc$TaxProfits[t]+res_mc$TaxIncome[t]
+    
+    #END OF PERIOD
+    #FINAL STOCKS OF CASH ARE COMPUTED
+    res_mc$CashH[t] = sum(cashH)
+    res_mc$CashF[t] = sum (cashF)
+    
+    #PUBLIC DEFICIT AND DEBT COMPUTED
+    res_mc$PDef[t] =  - govBalance
+    res_mc$PDebt[t] = res_mc$PDebt[max(1,t-1)] + res_mc$PDef[t]
+    
+  }
+  
+  #layout(matrix(c(1, 4, 7, 2, 5, 8, 3, 6, 9), 3, 3))
+  #layout.show(9)
+
+  plot(1:Time, res_mc$Y[1:Time],type="l",ylim=range(res_mc$Y),col=1,main="Y", ylab="",xlab="")
+  
+  plot(1:Time,res_mc$CashH[1:Time] ,type="l",ylim=range(res_mc$CashH),col=1,main="Cash H", ylab="CashH",xlab="")
+
+  plot(1:Time,res_mc$PDebt[1:Time],type="l",ylim=range(res_mc$PDebt),col=1,main="Public Debt",ylab="Public Debt",xlab="")
+
+  plot(1:Time,res_mc$PDef[1:Time],type="l",ylim=range(res_mc$PDef),col=1,main="Public Deficit",ylab="Public Deficit",xlab="")
+  
+  plot(1:Time,res_mc$UR[1:Time],type="l",ylim=range(res_mc$UR),col=1,main="Unemployment Rate",ylab="Unemployment Rate",xlab="")
+
+  par(mfrow=c(1,1))
+  plot(1:Time,res_mc$CashH[1:Time] ,type="l",lwd=2,ylim=range(c(-res_mc$PDebt,res_mc$CashH,res_mc$CashF)),col=1,main="Private Sector Wealth and Public Debt", ylab="",xlab="")
+  lines (1:Time,res_mc$CashF[1:Time],lwd=2,lty=1,col=2)
+  lines(1:Time,-res_mc$PDebt[1:Time],lwd=2,lty=1,col=3)
+  legend("topright",col=1:3,legend=c("Housholds' Cash","Firms' Cash", "Public Debt"),lwd=1,bty='n',xpd = TRUE, horiz = FALSE, inset = c(0, 0.1), cex = 0.8)
+  
+  par(mfrow=c(1,1))
+  plot(1:Time,res_mc$CDesired[1:Time] ,type="l",ylim=range(c(res_mc$CDesired,res_mc$CFeasible)),col=1,main="Desired and Feasible Nominal Consumption", ylab="",xlab="")
+  lines(1:Time,res_mc$CFeasible[1:Time],lwd=2,lty=1,col=2)
+  legend("right",col=1:2,legend=c("Desired Nominal Consumption","Feasible Nominal Consumption"),lwd=1,bty='n')
+  
+  
+}
