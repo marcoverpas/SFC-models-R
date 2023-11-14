@@ -1,6 +1,10 @@
 #OPEN Model
 
-#Created by Marco Veronese Passarella on 2 October 2018
+#This code replicates results in the book Monetary Economics:
+#An Integrated Approach to Credit, Money, Income, Production and Wealth,
+#by Wynne Godley and Marc Lavoie, chapter 6, figures 6.8 to 6.11.
+
+#Created by Marco Veronese Passarella, 2 October 2018
 
 #Clear
 rm(list=ls(all=TRUE))
