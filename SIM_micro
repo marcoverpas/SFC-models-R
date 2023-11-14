@@ -1,4 +1,8 @@
-#SIM with microfunded consumption, R version, 4 October 2018
+#SIM with microfunded consumption, R version
+
+#This code replicates model SIM but using individual consumption functions.
+
+#Created by Marco Veronese Passarella, 4 October 2018
 
 #Clear
 rm(list=ls(all=TRUE))
