@@ -1,7 +1,8 @@
 #PC model for R
-#from Wynne Godley and Marc Lavoie
-#Monetary Economics
-#Chapter 4 
+
+#This code replicates results in the book Monetary Economics:
+#An Integrated Approach to Credit, Money, Income, Production and Wealth,
+#by Wynne Godley and Marc Lavoie, chapter 4, figures 4.3 and 4.4.
 
 #Created by Marco Veronese Passarella on 30 May 2019
 
