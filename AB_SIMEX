@@ -5,11 +5,12 @@
 
 #Caiani's website: https://sites.google.com/view/alessandro-caiani/java-macro-ab-simulation-toolkit
 
+#Reproduced by Marco Veronese Passarella, April 6th, 2019
+
 #TIME SPAN OF THE SIMULATION
 Time = 200
 #MONTE CARLO REPETITIONS
 MC = 1
-
 
 #NUMBER OF HOUSHOLDS
 N = 1000
