@@ -4,7 +4,7 @@ SFC and other (discrete-time) toy models created using `R`. A continuous-time pr
 
 If you are interested in SFC models, you might also find the following useful:
 
-- [six lectures on SFC models](https://github.com/marcoverpas/Six_lectures_on_sfc_models);
+- the [six lectures on SFC models](https://github.com/marcoverpas/Six_lectures_on_sfc_models) I prepared for the Central University of Finance and Economics and the Center for China Fiscal Development, Beijing;
 
 - the material I prepared for the [17th EAEPE Summer School](https://github.com/marcoverpas/EAEPE_summer_school_2024);
 
