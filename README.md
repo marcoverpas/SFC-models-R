@@ -1,6 +1,6 @@
 # SFC-toy-models-R
 
-SFC and other toy models created using `R`. A continuous-time prototype of Model SIM is [now available](https://github.com/marcoverpas/SFC-models-R/blob/master/SIM%20A%20continuous%20time.R). 
+SFC and other (discrete-time) toy models created using `R`. A continuous-time prototype of Model SIM is [now available](https://github.com/marcoverpas/SFC-models-R/blob/master/SIM%20A%20continuous%20time.R). 
 
 See also my [six_lectures_on_SFC_models](https://github.com/marcoverpas/Six_lectures_on_sfc_models), the material I prepared for the [17th EAEPE Summer School](https://github.com/marcoverpas/EAEPE_summer_school_2024), and the directory named [other_codes](https://github.com/marcoverpas/Other_codes).
 
