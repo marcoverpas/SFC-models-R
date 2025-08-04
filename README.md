@@ -1,6 +1,8 @@
 # SFC-toy-models-R
 
-SFC and other toy models created using `R`. See also my [six_lectures_on_SFC_models](https://github.com/marcoverpas/Six_lectures_on_sfc_models), the material I prepared for the [17th EAEPE Summer School](https://github.com/marcoverpas/EAEPE_summer_school_2024), and the directory named [other_codes](https://github.com/marcoverpas/Other_codes).
+SFC and other toy models created using `R`. A continuous-time prototype of Model SIM is now available. 
+
+See also my [six_lectures_on_SFC_models](https://github.com/marcoverpas/Six_lectures_on_sfc_models), the material I prepared for the [17th EAEPE Summer School](https://github.com/marcoverpas/EAEPE_summer_school_2024), and the directory named [other_codes](https://github.com/marcoverpas/Other_codes).
 
 A simple interactive SFC model that allows users to experiment with coefficient values is available [here](https://x52gnt-marco-passarella.shinyapps.io/r_shiny/?fbclid=IwY2xjawGAWThleHRuA2FlbQIxMAABHa_vsLA-4LyohxjaGzUG-Q7hApCfLtA1tQv3ROY4igVC2vEg-ZGY__I3Zg_aem_aIs77gY7lE-X3VcnGM2I3A). 
 
