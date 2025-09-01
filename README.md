@@ -10,7 +10,7 @@ If you are interested in SFC models, you might also find the following useful:
 
 - the second part of the [PhD lectures for the University of Macerata, 2025](https://github.com/marcoverpas/PhD_Lectures_Macerata_2025);
 
-- the guest lecture I prepared for the [Summer School on Multiscale Modeling and Ecological Macroeconomics, 2025](https://github.com/marcoverpas/keynote_speech_Florence)
+- the guest lecture I prepared for the [Summer School on Multiscale Modeling and Ecological Macroeconomics, 2025](https://github.com/marcoverpas/keynote_speech_Florence);
 
 - the directory named [other_codes](https://github.com/marcoverpas/Other_codes).
 
