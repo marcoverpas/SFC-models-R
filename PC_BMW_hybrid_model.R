@@ -139,7 +139,7 @@ for (j in 1:nScenarios){
       #Capital stock
       k[j,i] = k[j,i-1] + id[j,i] - da[j,i]
       
-      #Loans
+      #Demand for loans
       ld[j,i] = ld[j,i-1] + id[j,i] - af[j,i]
       
       #Supply of bank loans
@@ -148,10 +148,10 @@ for (j in 1:nScenarios){
       #Supply of bank deposits
       ms[j,i] = ms[j,i-1] + (ls[j,i] - ls[j,i-1])
       
-      #Deposits as buffer stock
+      #Demand of deposits as buffer stock
       mh[j,i] = v[j,i] - b_h[j,i] - h_h[j,i]
       
-      #Bills held by banks (if negative then b_b = advances received from CB) ***
+      #Bills held by banks (if negative, advances received from CB)
       b_b[j,i] = mh[j,i] - ms[j,i]
       
     }
