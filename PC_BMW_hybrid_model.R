@@ -164,7 +164,7 @@ plot(h_h[1,2:nPeriods]-h_s[1,2:nPeriods], type="l",lwd=2,lty=1,
      main="Consistency check",ylab = '',xlab = '', ylim = range(-1,1))
 lines(mh[1,2:nPeriods]-ms[1,2:nPeriods]-b_b[1,2:nPeriods],type="l",
       lwd=2,lty=2, col=2)
-legend("topright",c("Cash: hh-hs","Deposits: mh-ms-bb"),bty="n",cex=1,
+legend("topright",c("Cash","Deposits"),bty="n",cex=1,
        lty=c(1,2),lwd=c(2,2),col=c(1,2),box.lwd=0)
 
 #+++++++++++++++++++++++++++++++++++
