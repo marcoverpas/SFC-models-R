@@ -142,8 +142,10 @@ for (j in 1:nScenarios){
       #Loans
       ld[j,i] = ld[j,i-1] + id[j,i] - af[j,i]
       
-      #Banks
+      #Supply of bank loans
       ls[j,i] = ls[j,i-1] + (ld[j,i] - ld[j,i-1]) 
+      
+      #Supply of bank deposits
       ms[j,i] = ms[j,i-1] + (ls[j,i] - ls[j,i-1])
       
       #Deposits as buffer stock
@@ -159,13 +161,9 @@ for (j in 1:nScenarios){
 #+++++++++++++++++++++++++++++++++++
 
 #Consistency check (redundant equation) ####
-plot(h_h[1,2:nPeriods]-h_s[1,2:nPeriods], type="l",lwd=2,lty=1,
+plot(h_h[1,2:nPeriods]-h_s[1,2:nPeriods],type="l",lwd=2,lty=1,col=2,
      font.main=1,cex.main=1,
-     main="Consistency check",ylab = '',xlab = '', ylim = range(-1,1))
-lines(mh[1,2:nPeriods]-ms[1,2:nPeriods]-b_b[1,2:nPeriods],type="l",
-      lwd=2,lty=2, col=2)
-legend("topright",c("Cash","Deposits"),bty="n",cex=1,
-       lty=c(1,2),lwd=c(2,2),col=c(1,2),box.lwd=0)
+     main="Consistency check (cash)",ylab='',xlab='',ylim=range(-1,1))
 
 #+++++++++++++++++++++++++++++++++++
 
