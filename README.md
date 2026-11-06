@@ -13,6 +13,3 @@ If you are interested in SFC models, you might also find the following useful:
 - the guest lecture I prepared for the [Summer School on Multiscale Modeling and Ecological Macroeconomics, 2025](https://github.com/marcoverpas/keynote_speech_Florence);
 
 - the directory named [other_codes](https://github.com/marcoverpas/Other_codes).
-
-A simple interactive SFC model that allows users to experiment with coefficient values is available [here](https://x52gnt-marco-passarella.shinyapps.io/r_shiny/?fbclid=IwY2xjawGAWThleHRuA2FlbQIxMAABHa_vsLA-4LyohxjaGzUG-Q7hApCfLtA1tQv3ROY4igVC2vEg-ZGY__I3Zg_aem_aIs77gY7lE-X3VcnGM2I3A). 
-
